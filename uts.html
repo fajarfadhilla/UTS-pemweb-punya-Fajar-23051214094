@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Wordle(?)</title>
+        <meta charset="utf-8">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+        }
+
+        hr{
+            width: 550px;
+        }
+
+        #judul{
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        #tabel{
+            width: 350px;
+            height: 420px;
+            margin: 0 auto;
+            margin-top: 3px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .kotak{
+            border: 2px solid lightskyblue;
+            width: 60px;
+            height: 60px;
+            margin: 3px;
+            color: black;
+            font-size: 36px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .benar{
+            background-color: aquamarine;
+            color: black;
+            border-color: white;
+        }
+
+        .ada{
+            background-color: lemonchiffon;
+            color: black;
+            border-color: white;
+        }
+
+        .nope{
+            background-color: darkgrey;
+            color: white;
+            border-color: white;
+        }
+
+        #ulang {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: lightskyblue;
+            border: none;
+            cursor: pointer;
+        }
+
+        #ulang:hover {
+            background-color: deepskyblue;
+        }
+
+        </style>
+    </head>
+
+    <body>
+        <h1 id="judul">WORDLE KW SUPER</h1>
+        <hr>
+        <br>
+        <div id="tabel">
+        </div>
+
+        <br>
+        <h1 id="jawaban"></h1>
+
+    </body>
+
+    <script>
+        var height = 6;
+        var width = 5;
+
+        var baris = 0;
+        var kolom = 0;
+
+        var gameOver = false;
+        var listkata = ["LEMON", "MEKAR", "BUNGA", "TUMOR", "HUTAN", "MOBIL", "MANIS", "PAHIT", "GERAH", "HALUS", "SEGAR", "SINGA", "TENDA", "SAKIT", "KERJA", "KABUT", "SEMUR", "JAMUR", "KERIS", "KURVA", "KERIS", "LAPIS"];
+        function kataacak(){
+            const randomIndex = Math.floor(Math.random() * listkata.length);
+            return listkata[randomIndex];
+        }
+
+        var kata = kataacak();
+        
+        window.onload = function(){
+            intialize();
+        }
+
+        function intialize(){
+            for (let x = 0; x < height; x++){
+                for (let y = 0; y < width; y++){
+                    let tile = document.createElement("span");
+                    tile.id = x.toString() + "-" + y.toString();
+                 tile.classList.add("kotak");
+                 tile.innerText = "";
+                 document.getElementById("tabel").appendChild(tile);
+                }
+            }
+
+            document.addEventListener("keyup", (e) => {
+                if (gameOver) return;
+
+                if ("KeyA" <= e.code && e.code <= "KeyZ"){
+                    if (kolom < width) {
+                        let currTile  = document.getElementById(baris.toString() + '-' + kolom.toString());
+                        if (currTile.innerText == ""){
+                            currTile.innerText = e.code[3];
+                            kolom += 1;
+                        }
+                    }
+                }
+                else if (e.code == "Backspace") {
+                    if (0 < kolom && kolom <= width){
+                        kolom -= 1;
+                    }
+                    let currTile  = document.getElementById(baris.toString() + '-' + kolom.toString());
+                    currTile.innerText = "";
+                }
+                else if (e.code == "Enter") {
+                    update();
+                    baris += 1;
+                    kolom = 0;
+                }
+
+                if (!gameOver && baris == height) {
+                gameOver = true;
+                document.getElementById("jawaban").innerText = kata;
+                Swal.fire({
+                    title: "Gagal",
+                    text: "Kata yang benar adalah: " + kata,
+                    imageUrl: "salah.gif",
+                    imageWidth: 400,
+                    imageHeight: 400,
+                    confirmButtonText: "OK"
+                });
+            }
+            })
+        }
+
+        function update(){
+            let benar = 0;
+            for (let x = 0; x < width; x++){
+                let currTile  = document.getElementById(baris.toString() + '-' + x.toString());
+                let huruf = currTile.innerText;
+
+                if (kata[x] == huruf) {
+                    currTile.classList.add("benar");
+                    benar += 1;
+                }
+                else if (kata.includes(huruf)){
+                    currTile.classList.add("ada");
+                }
+                else{
+                    currTile.classList.add("nope");
+                }
+
+                if (benar == width) {
+                gameOver = true;
+                Swal.fire({
+                    title: "Benar",
+                    text: "Selamat, anda berhasil. Anda pasti orang pintar!",
+                    imageUrl: "benar.gif",
+                    imageWidth: 400,
+                    imageHeight: 400,
+                    confirmButtonText: "OK"
+                });
+            }
+            }
+        }
+    </script>
+
+
+</html>
